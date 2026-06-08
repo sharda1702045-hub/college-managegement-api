@@ -27,25 +27,25 @@ Route::middleware(['auth:web'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Students CRUD
-    Route::get('/students', [AdminStudentController::class, 'index'])->name('admin.students.index');
+    Route::get('/students', [AdminStudentController::class, 'index'])->name('admin.students.index')->middleware('permission:view-students|students.*');
     Route::get('/students/create', [AdminStudentController::class, 'create'])->name('admin.students.create')->middleware('permission:manage-students|students.*');
     Route::post('/students', [AdminStudentController::class, 'store'])->name('admin.students.store')->middleware('permission:manage-students|students.*');
-    Route::get('/students/{student}', [AdminStudentController::class, 'show'])->name('admin.students.show');
+    Route::get('/students/{student}', [AdminStudentController::class, 'show'])->name('admin.students.show')->middleware('permission:view-students|students.*');
     Route::get('/students/{student}/edit', [AdminStudentController::class, 'edit'])->name('admin.students.edit')->middleware('permission:manage-students|students.*');
     Route::put('/students/{student}', [AdminStudentController::class, 'update'])->name('admin.students.update')->middleware('permission:manage-students|students.*');
     Route::delete('/students/{student}', [AdminStudentController::class, 'destroy'])->name('admin.students.destroy')->middleware('permission:manage-students|students.*');
 
     // Courses CRUD
-    Route::get('/courses', [AdminCourseController::class, 'index'])->name('admin.courses.index');
+    Route::get('/courses', [AdminCourseController::class, 'index'])->name('admin.courses.index')->middleware('permission:view-courses|courses.*');
     Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('admin.courses.create')->middleware('permission:manage-courses|courses.*');
     Route::post('/courses', [AdminCourseController::class, 'store'])->name('admin.courses.store')->middleware('permission:manage-courses|courses.*');
-    Route::get('/courses/{course}', [AdminCourseController::class, 'show'])->name('admin.courses.show');
+    Route::get('/courses/{course}', [AdminCourseController::class, 'show'])->name('admin.courses.show')->middleware('permission:view-courses|courses.*');
     Route::get('/courses/{course}/edit', [AdminCourseController::class, 'edit'])->name('admin.courses.edit')->middleware('permission:manage-courses|courses.*');
     Route::put('/courses/{course}', [AdminCourseController::class, 'update'])->name('admin.courses.update')->middleware('permission:manage-courses|courses.*');
     Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy'])->name('admin.courses.destroy')->middleware('permission:manage-courses|courses.*');
 
     // Enrollments CRUD
-    Route::get('/enrollments', [AdminEnrollmentController::class, 'index'])->name('admin.enrollments.index');
+    Route::get('/enrollments', [AdminEnrollmentController::class, 'index'])->name('admin.enrollments.index')->middleware('permission:view-enrollments|enrollments.*');
     Route::get('/enrollments/create', [AdminEnrollmentController::class, 'create'])->name('admin.enrollments.create')->middleware('permission:manage-enrollments|enrollments.*');
     Route::post('/enrollments', [AdminEnrollmentController::class, 'store'])->name('admin.enrollments.store')->middleware('permission:manage-enrollments|enrollments.*');
     Route::delete('/enrollments/{enrollment}', [AdminEnrollmentController::class, 'destroy'])->name('admin.enrollments.destroy')->middleware('permission:manage-enrollments|enrollments.*');
@@ -59,7 +59,7 @@ Route::middleware(['auth:web'])->prefix('admin')->group(function () {
     Route::delete('/admins/{admin}', [AdminUserController::class, 'destroy'])->name('admin.admins.destroy')->middleware('permission:admins.*');
 
     // Roles & Permissions Listing
-    Route::get('/roles', [AdminRolePermissionController::class, 'roles'])->name('admin.roles.index');
-    Route::get('/permissions', [AdminRolePermissionController::class, 'permissions'])->name('admin.permissions.index');
+    Route::get('/roles', [AdminRolePermissionController::class, 'roles'])->name('admin.roles.index')->middleware('permission:admins.*');
+    Route::get('/permissions', [AdminRolePermissionController::class, 'permissions'])->name('admin.permissions.index')->middleware('permission:admins.*');
 });
 

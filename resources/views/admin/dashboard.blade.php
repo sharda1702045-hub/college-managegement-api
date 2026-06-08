@@ -9,6 +9,7 @@
     <div class="row g-4 mb-4">
         
         <!-- Total Students Card -->
+        @canany(['view-students', 'students.*'])
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card stat-card p-3 border-0 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between">
@@ -25,8 +26,10 @@
                 </div>
             </div>
         </div>
+        @endcanany
 
         <!-- Total Courses Card -->
+        @canany(['view-courses', 'courses.*'])
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card stat-card p-3 border-0 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between">
@@ -43,8 +46,10 @@
                 </div>
             </div>
         </div>
+        @endcanany
 
         <!-- Total Enrollments Card -->
+        @canany(['view-enrollments', 'enrollments.*'])
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card stat-card p-3 border-0 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between">
@@ -61,39 +66,54 @@
                 </div>
             </div>
         </div>
+        @endcanany
 
     </div>
 
     <!-- Quick Navigation Cards -->
+    @canany(['manage-students', 'students.*', 'manage-courses', 'courses.*', 'manage-enrollments', 'enrollments.*', 'admins.*'])
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm p-4 bg-white">
                 <h5 class="fw-bold mb-3"><i class="fa-solid fa-rocket text-primary me-2"></i>Quick Actions</h5>
                 <div class="d-flex flex-wrap gap-3">
+                    @canany(['manage-students', 'students.*'])
                     <a href="{{ route('admin.students.create') }}" class="btn btn-outline-primary d-flex align-items-center gap-2 py-2 px-3">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Register New Student</span>
                     </a>
+                    @endcanany
+                    
+                    @canany(['manage-courses', 'courses.*'])
                     <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-success d-flex align-items-center gap-2 py-2 px-3">
                         <i class="fa-solid fa-folder-plus"></i>
                         <span>Create New Course</span>
                     </a>
+                    @endcanany
+                    
+                    @canany(['manage-enrollments', 'enrollments.*'])
                     <a href="{{ route('admin.enrollments.create') }}" class="btn btn-outline-warning d-flex align-items-center gap-2 py-2 px-3">
                         <i class="fa-solid fa-signature"></i>
                         <span>Enroll Student in Course</span>
                     </a>
+                    @endcanany
+                    
+                    @can('admins.*')
                     <a href="{{ route('admin.admins.create') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2 py-2 px-3">
                         <i class="fa-solid fa-shield-halved"></i>
                         <span>Add Admin / User</span>
                     </a>
+                    @endcan
                 </div>
             </div>
         </div>
     </div>
+    @endcanany
 
     <div class="row g-4">
         
         <!-- Latest Students Table -->
+        @canany(['view-students', 'students.*'])
         <div class="col-12 col-xl-6">
             <div class="card custom-table-card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
@@ -135,8 +155,10 @@
                 </div>
             </div>
         </div>
+        @endcanany
 
         <!-- Latest Enrollments Table -->
+        @canany(['view-enrollments', 'enrollments.*'])
         <div class="col-12 col-xl-6">
             <div class="card custom-table-card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
@@ -177,6 +199,7 @@
                 </div>
             </div>
         </div>
+        @endcanany
 
     </div>
 

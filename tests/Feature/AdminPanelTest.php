@@ -131,6 +131,8 @@ class AdminPanelTest extends TestCase
             ['GET', '/admin/admins/' . $this->otherUser->id . '/edit'],
             ['PUT', '/admin/admins/' . $this->otherUser->id],
             ['DELETE', '/admin/admins/' . $this->otherUser->id],
+            ['GET', '/admin/roles'],
+            ['GET', '/admin/permissions'],
         ];
 
         foreach ($forbiddenRoutes as $route) {
@@ -153,8 +155,6 @@ class AdminPanelTest extends TestCase
             '/admin/courses',
             '/admin/courses/1',
             '/admin/enrollments',
-            '/admin/roles',
-            '/admin/permissions',
         ];
 
         foreach ($allowedRoutes as $url) {
