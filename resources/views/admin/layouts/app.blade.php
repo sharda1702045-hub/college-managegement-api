@@ -150,18 +150,29 @@
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Dashboard</span>
             </a>
+            
+            @canany(['view-students', 'students.*'])
             <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-user-graduate"></i>
                 <span>Students</span>
             </a>
+            @endcanany
+
+            @canany(['view-courses', 'courses.*'])
             <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-book-open"></i>
                 <span>Courses</span>
             </a>
+            @endcanany
+
+            @canany(['view-enrollments', 'enrollments.*'])
             <a href="{{ route('admin.enrollments.index') }}" class="nav-link {{ request()->routeIs('admin.enrollments.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-id-card"></i>
                 <span>Enrollments</span>
             </a>
+            @endcanany
+
+            @can('admins.*')
             <a href="{{ route('admin.admins.index') }}" class="nav-link {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-user-shield"></i>
                 <span>Admins</span>
@@ -174,6 +185,7 @@
                 <i class="fa-solid fa-key"></i>
                 <span>Permissions</span>
             </a>
+            @endcan
         </div>
     </div>
 

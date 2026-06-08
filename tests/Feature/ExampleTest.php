@@ -7,10 +7,12 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_the_application_redirects_to_external_dashboard(): void
+    public function test_the_application_landing_page_renders_successfully(): void
     {
         $response = $this->get('/');
 
-        $response->assertRedirect('http://3.26.196.155/admin/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('/admin/login');
+        $response->assertSee('/api/documentation');
     }
 }

@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\AdminEnrollmentController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminRolePermissionController;
 
-Route::redirect('/', 'http://3.26.196.155/admin/dashboard');
+Route::get('/', function () {
+    return view('welcome');
+})->name('landing');
 
 Route::get('/api/documentation', function () {
     return view('swagger');

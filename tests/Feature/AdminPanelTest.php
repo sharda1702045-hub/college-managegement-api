@@ -247,4 +247,30 @@ class AdminPanelTest extends TestCase
         $response->assertRedirect('/admin/enrollments/create');
         $response->assertSessionHasErrors(['student_id']);
     }
+
+    /**
+     * Sidebar module visibility based on permissions.
+     */
+    public function test_sidebar_links_visibility_based_on_permissions(): void
+    {
+        // Staff user view
+        $response = $this->actingAs($this->staffUser, 'web')->get('/admin/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('Students');
+        $response->assertSee('Courses');
+        $response->assertSee('Enrollments');
+        $response->assertDontSee('admin/admins');
+        $response->assertDontSee('admin/roles');
+        $response->assertDontSee('admin/permissions');
+
+        // Super Admin view
+        $response = $this->actingAs($this->superAdmin, 'web')->get('/admin/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('Students');
+        $response->assertSee('Courses');
+        $response->assertSee('Enrollments');
+        $response->assertSee('admin/admins');
+        $response->assertSee('admin/roles');
+        $response->assertSee('admin/permissions');
+    }
 }
