@@ -42,6 +42,13 @@ class AuthService
             ]);
         }
 
+        // Only users with Admin or Super Admin role are allowed to log in to the API
+        if (!$user->hasAnyRole(['Super Admin', 'Admin', 'admin'])) {
+            throw ValidationException::withMessages([
+                'email' => ['Access denied: only administrators are allowed to access the API.'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [

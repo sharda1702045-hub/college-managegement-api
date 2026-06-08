@@ -18,7 +18,7 @@ class AuthTest extends TestCase
         $this->seed();
     }
 
-    public function test_user_can_register(): void
+    public function test_registration_route_is_disabled(): void
     {
         $response = $this->postJson('/api/register', [
             'name' => 'John Doe',
@@ -26,56 +26,17 @@ class AuthTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(201)
-            ->assertJson([
-                'success' => true,
-                'message' => 'User registered successfully',
-            ])
-            ->assertJsonStructure([
-                'success',
-                'message',
-                'data' => [
-                    'user' => ['id', 'name', 'email'],
-                    'access_token',
-                    'token_type',
-                ],
-            ]);
-
-        $this->assertDatabaseHas('users', ['email' => 'john@example.com']);
-        
-        $user = User::where('email', 'john@example.com')->first();
-        $this->assertTrue($user->hasRole('staff'));
+        $response->assertStatus(404);
     }
 
-    public function test_registration_validation_fails_with_existing_email(): void
-    {
-        User::create([
-            'name' => 'Existing User',
-            'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-        ]);
-
-        $response = $this->postJson('/api/register', [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => 'password123',
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Validation failed',
-            ])
-            ->assertJsonValidationErrors(['email']);
-    }
-
-    public function test_user_can_login(): void
+    public function test_admin_user_can_login(): void
     {
         $user = User::create([
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
             'password' => Hash::make('password123'),
         ]);
+        $user->assignRole('Admin');
 
         $response = $this->postJson('/api/login', [
             'email' => 'jane@example.com',
@@ -89,6 +50,30 @@ class AuthTest extends TestCase
             ])
             ->assertJsonStructure([
                 'data' => ['access_token', 'token_type'],
+            ]);
+    }
+
+    public function test_non_admin_user_cannot_login(): void
+    {
+        $user = User::create([
+            'name' => 'Staff User',
+            'email' => 'staff_test@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+        $user->assignRole('Staff');
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'staff_test@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => [
+                    'email' => ['Access denied: only administrators are allowed to access the API.']
+                ]
             ]);
     }
 

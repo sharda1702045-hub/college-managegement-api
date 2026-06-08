@@ -2,209 +2,182 @@
 
 A secure, RESTful API built with PHP 8.2+ and Laravel 11.x to manage students, courses, and course enrollments. 
 
-This project demonstrates clean coding standards, database design, token-based authentication (Laravel Sanctum), Role-Based Access Control (Spatie), Service-Repository architecture, automatic caching, robust input validation, and global error handling.
+---
+
+## 🔐 Core System Rules
+
+This is an **Admin-Only API System**:
+* **Admin Login Only**: Only users with the `Admin`, `Super Admin`, or legacy lowercase `admin` role are permitted to log in via the API and retrieve tokens.
+* **Staff Blocked**: Staff users and standard users are blocked from logging in on the API.
+* **No Registration Endpoint**: The `/api/register` endpoint has been completely disabled and removed from the application routes and Swagger UI documentation.
+* **Admin UI Creation**: Users, staff, and admin accounts must only be created by an administrator via the Admin Panel interface.
 
 ---
 
-## Technical Stack & Architectural Decisions
+## 1. 📥 Project Clone & Setup
 
-* **Framework**: Laravel 11.x
-* **Language**: PHP 8.2+
-* **Database**: MySQL 8.0+
-* **Authentication**: Token-based via **Laravel Sanctum**
-* **RBAC (Role-Based Access Control)**: Managed using **Spatie Laravel Permission**. Two roles are defined:
-  - `admin`: Full CRUD permissions (`view-*` and `manage-*`).
-  - `staff`: Read-only permissions (`view-*` GET endpoints only).
-* **Design Patterns**: 
-  - **Repository Pattern**: Abstracted database access layers.
-  - **Service Layer Architecture**: Decoupled controllers from core business logic (caching, checking duplication, data manipulation).
-* **Caching**: Version-based caching applied to lists (Students, Courses, Enrollments). Automatic cache invalidation triggers on create, update, or delete operations.
-* **Rate Limiting**: Enforced via custom API throttlers limiting requests to protect system availability.
-* **Database Optimization**: Custom schema length configurations avoiding MySQL UTF8MB4 index limit constraints.
+### Clone the Repository
+```bash
+git clone https://github.com/sharda1702045-hub/college-managegement-api.git
+cd college-managegement-api
+git checkout main
+```
+
+### Setup Environment & Dependencies
+1. **Install Composer dependencies**:
+   ```bash
+   composer install
+   ```
+2. **Setup environment config**:
+   ```bash
+   cp .env.example .env
+   ```
+3. **Generate application key**:
+   ```bash
+   php artisan key:generate
+   ```
+4. **Configure your Database**:
+   Create a database (e.g. `college-management-api`) and update the database variables in the `.env` file:
+   ```ini
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=college-management-api
+   DB_USERNAME=root
+   DB_PASSWORD=YOUR_PASSWORD
+   ```
+5. **Run Migrations & Seeds**:
+   ```bash
+   php artisan migrate --seed
+   ```
+6. **Start local development server**:
+   ```bash
+   php artisan serve
+   ```
 
 ---
 
-## Project Structure
+## 2. 🧑💻 Admin Setup
 
-The project has a clear separation of concerns:
+Administrators are either seeded automatically or can be created via Tinker.
 
-```
-app/
-├── Http/
-│   ├── Controllers/
-│   │   └── Api/                  # API Controllers (Auth, Student, Course, Enrollment)
-│   ├── Requests/                 # Input FormRequest Validation Classes
-│   └── Middleware/               # Core middlewares (including Spatie permissions)
-├── Models/                       # Eloquent Models (User, Student, Course, Enrollment)
-├── Repositories/                 # Data access layer (Interfaces and implementations)
-└── Services/                     # Business logic layer (Caching, calculations, mappings)
-routes/
-└── api.php                       # Route definitions mapped with Sanctum and Spatie middlewares
-```
-
----
-
-## Installation & Setup
-
-### 1. Prerequisites
-Ensure you have the following installed on your system:
-* PHP 8.2 or higher
-* Composer
-* MySQL 8.0 or higher
-* Git
-
-### 2. Clone the Repository
-```bash
-git clone <repository_url>
-cd college-management-api
-```
-
-### 3. Install Dependencies
-```bash
-composer install
-```
-
-### 4. Environment Configuration
-Copy the `.env.example` file to `.env`:
-```bash
-cp .env.example .env
-```
-Open the `.env` file and configure your database settings:
-```ini
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=college-management-api
-DB_USERNAME=root
-DB_PASSWORD=YOUR_DATABASE_PASSWORD
-```
-
-### 5. Generate Application Key
-```bash
-php artisan key:generate
-```
-
-### 6. Run Database Migrations & Seeds
-Run migrations to set up tables and execute seeds to preconfigure Spatie roles, permissions, and test accounts:
-```bash
-php artisan migrate --seed
-```
-
-This will automatically create:
+### Auto-Seeded Admin Credentials
+* **Super Admin**:
+  * Email: `superadmin@example.com`
+  * Password: `password`
 * **Admin User**:
-  - Email: `admin@example.com`
-  - Password: `password`
-  - Role: `admin` (Full CRUD operations allowed)
-* **Staff User**:
-  - Email: `staff@example.com`
-  - Password: `password`
-  - Role: `staff` (Read-only GET operations allowed)
+  * Email: `admin@example.com`
+  * Password: `password`
 
----
-
-## Running the Project
-
-### Start Development Server
+### Creating an Admin User via Tinker
 ```bash
-php artisan serve
+php artisan tinker
 ```
-By default, the server runs at `http://127.0.0.1:8000`.
+```php
+$user = App\Models\User::create([
+    'name' => 'New Admin',
+    'email' => 'newadmin@example.com',
+    'password' => Hash::make('securepassword123'),
+]);
 
-### Run Automated Tests
-Execute the feature test suite (running on an isolated in-memory SQLite database):
+$user->assignRole('Admin');
+```
+
+---
+
+## 3. 🚀 Swagger Documentation
+
+* **Interactive Swagger UI**: Accessible at `http://127.0.0.1:8000/api/documentation` (or your active server IP)
+* **Swagger Specs Locations**: 
+  - Root configuration: `swagger.json`
+  - Public directory: `public/swagger.json` (served to the browser UI client)
+
+---
+
+## 4. 🔐 Authentication System
+
+### Login Endpoint
+`POST /api/login`
+
+* **Payload Requirements**:
+  ```json
+  {
+    "email": "admin@example.com",
+    "password": "password"
+  }
+  ```
+* **Authentication Rules**:
+  * Only users possessing administrative roles (`Super Admin`, `Admin`, or `admin`) can authenticate.
+  * Access token is returned on success.
+  * Attempts by staff users or accounts without admin roles are rejected with a validation error (`422 Unprocessable Content`).
+
+### Removed Endpoint
+`POST /api/register`
+* This route is completely removed from `routes/api.php` and does not appear in the Swagger specs.
+
+---
+
+## 5. 🧭 API Routes Structure
+
+All endpoints under the `/api` prefix require authentication via Laravel Sanctum bearer token (except login) and are restricted by role permission gates.
+
+### Auth APIs
+* `POST /api/login` - Authenticate admin credentials and generate access token.
+* `POST /api/logout` - Revoke current authenticated session token (Sanctum protected).
+
+### Student APIs (Admin Protected)
+* `GET /api/students` - Paginated and searchable list of students.
+* `POST /api/students` - Register a new student record.
+* `GET /api/students/{id}` - Fetch detailed student profile by ID.
+* `PUT /api/students/{id}` - Update student information by ID.
+* `DELETE /api/students/{id}` - Delete student record by ID.
+
+### Course APIs (Admin Protected)
+* `GET /api/courses` - List all courses.
+* `POST /api/courses` - Create a new course record.
+* `GET /api/courses/{id}` - Fetch course details by ID.
+* `PUT /api/courses/{id}` - Update course information by ID.
+* `DELETE /api/courses/{id}` - Delete course record by ID.
+
+### Enrollment APIs (Admin Protected)
+* `GET /api/enrollments` - List all student-course enrollments.
+* `POST /api/enrollments` - Enroll a student in a course.
+* `DELETE /api/enrollments/{id}` - Remove an enrollment record by ID.
+
+---
+
+## 🛡️ Security Rules & Role-Based Access Control
+
+* **Admin Verification**: Configured in `AuthService` to validate administrative roles before issuing Sanctum tokens.
+* **Exception Responses**: Non-admin login attempts yield standard validation error structure:
+  ```json
+  {
+    "success": false,
+    "message": "Validation failed",
+    "errors": {
+      "email": [
+        "Access denied: only administrators are allowed to access the API."
+      ]
+    }
+  }
+  ```
+
+---
+
+## 📄 Swagger Cleanup
+* The `/api/register` path is excluded from `swagger.json` and `public/swagger.json`.
+* Only functional admin endpoints are listed in the Swagger UI.
+
+---
+
+## 🧪 Testing Instructions
+
+Run the testing suite using:
 ```bash
-php artisan test
+php vendor/bin/phpunit
 ```
 
----
-
-## API Documentation
-
-### Endpoints Overview
-
-| Method | Endpoint | Auth | RBAC Role | Description |
-|---|---|---|---|---|
-| `POST` | `/api/register` | Public | None | Register a new user (gets `staff` role by default) |
-| `POST` | `/api/login` | Public | None | Login user & return plain-text Sanctum token |
-| `POST` | `/api/logout` | Protected | `admin` / `staff` | Revoke current user session token |
-| `GET` | `/api/students` | Protected | `admin` / `staff` | Get list of students (Supports search and pagination) |
-| `POST` | `/api/students` | Protected | `admin` | Create a new student record |
-| `GET` | `/api/students/{id}` | Protected | `admin` / `staff` | Get student details by ID |
-| `PUT` | `/api/students/{id}` | Protected | `admin` | Update student details by ID |
-| `DELETE` | `/api/students/{id}`| Protected | `admin` | Delete student by ID |
-| `GET` | `/api/courses` | Protected | `admin` / `staff` | Get list of courses |
-| `POST` | `/api/courses` | Protected | `admin` | Create a new course |
-| `GET` | `/api/courses/{id}` | Protected | `admin` / `staff` | Get course details by ID |
-| `PUT` | `/api/courses/{id}` | Protected | `admin` | Update course details by ID |
-| `DELETE` | `/api/courses/{id}` | Protected | `admin` | Delete course by ID |
-| `GET` | `/api/enrollments` | Protected | `admin` / `staff` | Get list of student course enrollments |
-| `POST` | `/api/enrollments` | Protected | `admin` | Enroll a student in a course (prevents duplicates) |
-| `DELETE` | `/api/enrollments/{id}`| Protected | `admin` | Remove an enrollment by ID |
-
----
-
-## Validation & Error Responses
-
-### Success Response Format
-All successful operations return a standard envelope structure:
-```json
-{
-  "success": true,
-  "message": "Student created successfully",
-  "data": {
-    "id": 1,
-    "first_name": "Bob",
-    "last_name": "Jones",
-    "email": "bob@example.com",
-    "phone": "9876543210",
-    "date_of_birth": "1999-05-15"
-  }
-}
-```
-
-### Validation Error Response (422)
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "errors": {
-    "email": ["The email has already been taken."],
-    "phone": ["The phone number format is invalid. It must be a valid phone format with 10 to 20 digits."]
-  }
-}
-```
-
-### Resource Not Found (404)
-```json
-{
-  "success": false,
-  "message": "Resource not found",
-  "errors": {}
-}
-```
-
-### Unauthorized (401)
-```json
-{
-  "success": false,
-  "message": "Unauthorized request",
-  "errors": {}
-}
-```
-
-### Access Denied (403)
-```json
-{
-  "success": false,
-  "message": "Access denied: unauthorized role or permission",
-  "errors": {}
-}
-```
-
----
-
-## Deliverables in Repository
-
-* **Database Schema DDL**: [database_schema.sql](file:///c:/wamp64/www/college-management-api/database_schema.sql)
-* **OpenAPI / Swagger Specs**: [swagger.json](file:///c:/wamp64/www/college-management-api/public/swagger.json) (interactive UI accessible at `http://127.0.0.1:8000/api/documentation`)
-* **Postman Collection**: [Postman_Collection.json](file:///c:/wamp64/www/college-management-api/Postman_Collection.json)
+### Verified Test Scenarios
+* **Admin Login Success**: Asserts that an administrator logs in and gets a Sanctum token.
+* **Staff Login Failure**: Asserts that staff credentials fail to authenticate with a `422` validation response.
+* **Registration Disabled Check**: Asserts that `/api/register` yields a `404 Not Found` response.
