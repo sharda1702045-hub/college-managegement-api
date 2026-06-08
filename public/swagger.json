@@ -1,0 +1,467 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "College Management API",
+    "description": "A RESTful College Management API with Laravel 11, including Token Authentication (Sanctum), Role-Based Access Control (Spatie), and Caching.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Local Development Server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/register": {
+      "post": {
+        "summary": "Register a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string", "example": "John Doe" },
+                  "email": { "type": "string", "example": "john@example.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "User registered successfully",
+                  "data": {
+                    "user": {
+                      "id": 1,
+                      "name": "John Doe",
+                      "email": "john@example.com"
+                    },
+                    "access_token": "1|abcdef12345...",
+                    "token_type": "Bearer"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "errors": {
+                    "email": ["The email has already been taken."]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Login user and generate token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "admin@example.com" },
+                  "password": { "type": "string", "example": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "User logged in successfully",
+                  "data": {
+                    "user": {
+                      "id": 1,
+                      "name": "Admin User",
+                      "email": "admin@example.com"
+                    },
+                    "access_token": "2|abcdef12345...",
+                    "token_type": "Bearer"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed / Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "errors": {
+                    "email": ["Invalid login credentials."]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Logout current user (revoke token)",
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "User logged out successfully",
+                  "data": {}
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized request"
+          }
+        }
+      }
+    },
+    "/api/students": {
+      "get": {
+        "summary": "Get all students (Search & Paginated)",
+        "description": "Permissions: view-students (Admin, Staff)",
+        "parameters": [
+          { "name": "search", "in": "query", "description": "Search term for first_name, last_name, email, or phone", "required": false, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "description": "Page number", "required": false, "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "description": "Number of items per page", "required": false, "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Students list successfully retrieved",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Students retrieved successfully",
+                  "data": {
+                    "current_page": 1,
+                    "total_records": 1,
+                    "total_pages": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "first_name": "Bob",
+                        "last_name": "Jones",
+                        "email": "bob@example.com",
+                        "phone": "9876543210",
+                        "date_of_birth": "1999-05-15",
+                        "created_at": "2026-06-05T10:10:00.000000Z",
+                        "updated_at": "2026-06-05T10:10:00.000000Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new student",
+        "description": "Permissions: manage-students (Admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["first_name", "last_name", "email", "phone", "date_of_birth"],
+                "properties": {
+                  "first_name": { "type": "string", "example": "Bob" },
+                  "last_name": { "type": "string", "example": "Jones" },
+                  "email": { "type": "string", "example": "bob@example.com" },
+                  "phone": { "type": "string", "example": "9876543210" },
+                  "date_of_birth": { "type": "string", "format": "date", "example": "1999-05-15" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Student created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Student created successfully",
+                  "data": {
+                    "id": 1,
+                    "first_name": "Bob",
+                    "last_name": "Jones",
+                    "email": "bob@example.com",
+                    "phone": "9876543210",
+                    "date_of_birth": "1999-05-15"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed"
+          },
+          "403": {
+            "description": "Access Denied"
+          }
+        }
+      }
+    },
+    "/api/students/{id}": {
+      "get": {
+        "summary": "Get student by ID",
+        "description": "Permissions: view-students (Admin, Staff)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student details"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update student by ID",
+        "description": "Permissions: manage-students (Admin only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["first_name", "last_name", "email", "phone", "date_of_birth"],
+                "properties": {
+                  "first_name": { "type": "string", "example": "Bob" },
+                  "last_name": { "type": "string", "example": "Jones" },
+                  "email": { "type": "string", "example": "bob@example.com" },
+                  "phone": { "type": "string", "example": "9876543210" },
+                  "date_of_birth": { "type": "string", "format": "date", "example": "1999-05-15" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Student updated successfully"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete student by ID",
+        "description": "Permissions: manage-students (Admin only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student deleted successfully"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/api/courses": {
+      "get": {
+        "summary": "Get all courses",
+        "description": "Permissions: view-courses (Admin, Staff)",
+        "responses": {
+          "200": {
+            "description": "List of courses"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new course",
+        "description": "Permissions: manage-courses (Admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["course_name", "course_code"],
+                "properties": {
+                  "course_name": { "type": "string", "example": "Database Systems" },
+                  "course_code": { "type": "string", "example": "CS301" },
+                  "description": { "type": "string", "example": "SQL fundamentals" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Course created successfully"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}": {
+      "get": {
+        "summary": "Get course by ID",
+        "description": "Permissions: view-courses (Admin, Staff)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course details"
+          },
+          "404": {
+            "description": "Course not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update course by ID",
+        "description": "Permissions: manage-courses (Admin only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["course_name", "course_code"],
+                "properties": {
+                  "course_name": { "type": "string", "example": "Advanced Database Systems" },
+                  "course_code": { "type": "string", "example": "CS301" },
+                  "description": { "type": "string", "example": "Relational and NoSQL Databases" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete course by ID",
+        "description": "Permissions: manage-courses (Admin only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course deleted successfully"
+          }
+        }
+      }
+    },
+    "/api/enrollments": {
+      "get": {
+        "summary": "Get all student enrollments",
+        "description": "Permissions: view-enrollments (Admin, Staff)",
+        "responses": {
+          "200": {
+            "description": "List of enrollments"
+          }
+        }
+      },
+      "post": {
+        "summary": "Enroll a student in a course",
+        "description": "Permissions: manage-enrollments (Admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["student_id", "course_id"],
+                "properties": {
+                  "student_id": { "type": "integer", "example": 1 },
+                  "course_id": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Student enrolled successfully"
+          },
+          "422": {
+            "description": "Validation failed / Duplicate enrollment"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}": {
+      "delete": {
+        "summary": "Remove an enrollment",
+        "description": "Permissions: manage-enrollments (Admin only)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enrollment removed successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
