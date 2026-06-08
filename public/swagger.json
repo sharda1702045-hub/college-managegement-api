@@ -7,6 +7,10 @@
   },
   "servers": [
     {
+      "url": "http://3.26.196.155",
+      "description": "Dev Server"
+    },
+    {
       "url": "http://127.0.0.1:8000",
       "description": "Local Development Server"
     }
@@ -27,11 +31,24 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "email", "password"],
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
                 "properties": {
-                  "name": { "type": "string", "example": "John Doe" },
-                  "email": { "type": "string", "example": "john@example.com" },
-                  "password": { "type": "string", "example": "password123" }
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  }
                 }
               }
             }
@@ -66,7 +83,9 @@
                   "success": false,
                   "message": "Validation failed",
                   "errors": {
-                    "email": ["The email has already been taken."]
+                    "email": [
+                      "The email has already been taken."
+                    ]
                   }
                 }
               }
@@ -85,10 +104,19 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
-                  "email": { "type": "string", "example": "admin@example.com" },
-                  "password": { "type": "string", "example": "password" }
+                  "email": {
+                    "type": "string",
+                    "example": "admin@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password"
+                  }
                 }
               }
             }
@@ -123,7 +151,9 @@
                   "success": false,
                   "message": "Validation failed",
                   "errors": {
-                    "email": ["Invalid login credentials."]
+                    "email": [
+                      "Invalid login credentials."
+                    ]
                   }
                 }
               }
@@ -159,9 +189,35 @@
         "summary": "Get all students (Search & Paginated)",
         "description": "Permissions: view-students (Admin, Staff)",
         "parameters": [
-          { "name": "search", "in": "query", "description": "Search term for first_name, last_name, email, or phone", "required": false, "schema": { "type": "string" } },
-          { "name": "page", "in": "query", "description": "Page number", "required": false, "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "description": "Number of items per page", "required": false, "schema": { "type": "integer", "default": 10 } }
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term for first_name, last_name, email, or phone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -203,13 +259,35 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["first_name", "last_name", "email", "phone", "date_of_birth"],
+                "required": [
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "phone",
+                  "date_of_birth"
+                ],
                 "properties": {
-                  "first_name": { "type": "string", "example": "Bob" },
-                  "last_name": { "type": "string", "example": "Jones" },
-                  "email": { "type": "string", "example": "bob@example.com" },
-                  "phone": { "type": "string", "example": "9876543210" },
-                  "date_of_birth": { "type": "string", "format": "date", "example": "1999-05-15" }
+                  "first_name": {
+                    "type": "string",
+                    "example": "Bob"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "example": "Jones"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "bob@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "9876543210"
+                  },
+                  "date_of_birth": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1999-05-15"
+                  }
                 }
               }
             }
@@ -249,7 +327,14 @@
         "summary": "Get student by ID",
         "description": "Permissions: view-students (Admin, Staff)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -264,7 +349,14 @@
         "summary": "Update student by ID",
         "description": "Permissions: manage-students (Admin only)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -272,13 +364,35 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["first_name", "last_name", "email", "phone", "date_of_birth"],
+                "required": [
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "phone",
+                  "date_of_birth"
+                ],
                 "properties": {
-                  "first_name": { "type": "string", "example": "Bob" },
-                  "last_name": { "type": "string", "example": "Jones" },
-                  "email": { "type": "string", "example": "bob@example.com" },
-                  "phone": { "type": "string", "example": "9876543210" },
-                  "date_of_birth": { "type": "string", "format": "date", "example": "1999-05-15" }
+                  "first_name": {
+                    "type": "string",
+                    "example": "Bob"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "example": "Jones"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "bob@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "9876543210"
+                  },
+                  "date_of_birth": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1999-05-15"
+                  }
                 }
               }
             }
@@ -297,7 +411,14 @@
         "summary": "Delete student by ID",
         "description": "Permissions: manage-students (Admin only)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -328,11 +449,23 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["course_name", "course_code"],
+                "required": [
+                  "course_name",
+                  "course_code"
+                ],
                 "properties": {
-                  "course_name": { "type": "string", "example": "Database Systems" },
-                  "course_code": { "type": "string", "example": "CS301" },
-                  "description": { "type": "string", "example": "SQL fundamentals" }
+                  "course_name": {
+                    "type": "string",
+                    "example": "Database Systems"
+                  },
+                  "course_code": {
+                    "type": "string",
+                    "example": "CS301"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "SQL fundamentals"
+                  }
                 }
               }
             }
@@ -350,7 +483,14 @@
         "summary": "Get course by ID",
         "description": "Permissions: view-courses (Admin, Staff)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -365,7 +505,14 @@
         "summary": "Update course by ID",
         "description": "Permissions: manage-courses (Admin only)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -373,11 +520,23 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["course_name", "course_code"],
+                "required": [
+                  "course_name",
+                  "course_code"
+                ],
                 "properties": {
-                  "course_name": { "type": "string", "example": "Advanced Database Systems" },
-                  "course_code": { "type": "string", "example": "CS301" },
-                  "description": { "type": "string", "example": "Relational and NoSQL Databases" }
+                  "course_name": {
+                    "type": "string",
+                    "example": "Advanced Database Systems"
+                  },
+                  "course_code": {
+                    "type": "string",
+                    "example": "CS301"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Relational and NoSQL Databases"
+                  }
                 }
               }
             }
@@ -393,7 +552,14 @@
         "summary": "Delete course by ID",
         "description": "Permissions: manage-courses (Admin only)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -421,10 +587,19 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["student_id", "course_id"],
+                "required": [
+                  "student_id",
+                  "course_id"
+                ],
                 "properties": {
-                  "student_id": { "type": "integer", "example": 1 },
-                  "course_id": { "type": "integer", "example": 1 }
+                  "student_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "course_id": {
+                    "type": "integer",
+                    "example": 1
+                  }
                 }
               }
             }
@@ -445,7 +620,14 @@
         "summary": "Remove an enrollment",
         "description": "Permissions: manage-enrollments (Admin only)",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
