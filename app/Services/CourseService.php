@@ -28,6 +28,20 @@ class CourseService
         });
     }
 
+    public function searchAndPaginateCourses(?string $search, int $limit, int $page)
+    {
+        if (!Cache::has('courses_cache_version')) {
+            Cache::put('courses_cache_version', 1, 86400);
+        }
+
+        $version = Cache::get('courses_cache_version', 1);
+        $cacheKey = "courses_v{$version}_page_{$page}_limit_{$limit}_search_" . ($search ?? 'all');
+
+        return Cache::remember($cacheKey, 3600, function () use ($search, $limit, $page) {
+            return $this->courseRepository->searchAndPaginate($search, $limit, $page);
+        });
+    }
+
     public function getCourseById(int $id)
     {
         return Cache::remember("course_{$id}", 3600, function () use ($id) {

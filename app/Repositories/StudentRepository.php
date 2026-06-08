@@ -24,6 +24,6 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
             });
         }
 
-        return $query->paginate($limit, ['*'], 'page', $page);
+        return $query->orderBy('id', 'desc')->paginate($limit, ['*'], 'page', $page);
     }
 }

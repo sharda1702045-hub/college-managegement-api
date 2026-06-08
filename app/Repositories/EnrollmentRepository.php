@@ -20,6 +20,6 @@ class EnrollmentRepository extends BaseRepository implements EnrollmentRepositor
 
     public function all()
     {
-        return $this->model->with(['student', 'course'])->get();
+        return $this->model->with(['student', 'course'])->orderBy('id', 'desc')->get();
     }
 }
